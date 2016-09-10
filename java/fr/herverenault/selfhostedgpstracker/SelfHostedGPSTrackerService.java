@@ -169,60 +169,70 @@ public class SelfHostedGPSTrackerService extends IntentService implements Locati
         public void run() {
             String message;
             int code = 0;
+            boolean success = false;
+            // Retry every 10 seconds at least in case of network failure
+            int retry = 10 + Math.round(pref_gps_updates / 4);
+            // Try to keep at most 10 threads alive
+            int iMax = Math.round(9 * pref_gps_updates / retry);
 
-            try {
-                URL url = new URL(urlText + params);
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setReadTimeout(10000 /* milliseconds */);
-                conn.setConnectTimeout(15000 /* milliseconds */);
-                conn.setRequestMethod("GET");
-                conn.setDoInput(true);
-                conn.connect();
-                code = conn.getResponseCode();
-                Log.d(MY_TAG, "HTTP request done: " + code);
-                message = "HTTP " + code;
-            }
-            catch (MalformedURLException e) {
-                message = getResources().getString(R.string.error_malformed_url);
-            }
-            catch (UnknownHostException e) {
-                message = getResources().getString(R.string.error_unknown_host);
-            }
-            catch (SSLHandshakeException e) {
-                message = getResources().getString(R.string.error_ssl);
-            }
-            catch (SocketTimeoutException e) {
-                message = getResources().getString(R.string.error_timeout);
-            }
-            catch (Exception e) {
-                Log.d(MY_TAG, "HTTP request failed: " + e);
-                message = e.getLocalizedMessage();
-                if (message == null) {
-                    message = e.toString();
-                }
-            }
-
-            if ( ! params.startsWith("tracker=")) {
-                lastServerResponse = getResources().getString(R.string.last_location_sent_at)
-                        + " "
-                        + DateFormat.getTimeInstance().format(new Date())
-                        + " ";
-
-                if (code == 200) {
-                    lastServerResponse += "<font color='#00aa00'><b>"
-                            + getResources().getString(R.string.http_request_ok)
-                            + "</b></font>";
-                } else {
-                    lastServerResponse += "<font color='#ff0000'><b>"
-                            + getResources().getString(R.string.http_request_failed)
-                            + "</b></font>"
-                            + "<br>"
-                            + "(" + message + ")";
+            for (int i = 1; !(success || i > iMax || !SelfHostedGPSTrackerService.isRunning); i++) {
+                try {
+                    URL url = new URL(urlText + params);
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setReadTimeout(10000 /* milliseconds */);
+                    conn.setConnectTimeout(15000 /* milliseconds */);
+                    conn.setRequestMethod("GET");
+                    conn.setDoInput(true);
+                    conn.connect();
+                    code = conn.getResponseCode();
+                    Log.d(MY_TAG, "HTTP request done: " + code);
+                    message = "HTTP " + code;
+                    success = true;
+                } catch (MalformedURLException e) {
+                    message = getResources().getString(R.string.error_malformed_url);
+                } catch (UnknownHostException e) {
+                    message = getResources().getString(R.string.error_unknown_host);
+                } catch (SSLHandshakeException e) {
+                    message = getResources().getString(R.string.error_ssl);
+                } catch (SocketTimeoutException e) {
+                    message = getResources().getString(R.string.error_timeout);
+                } catch (Exception e) {
+                    Log.d(MY_TAG, "HTTP request failed: " + e);
+                    message = e.getLocalizedMessage();
+                    if (message == null) {
+                        message = e.toString();
+                    }
                 }
 
-                Intent notifIntent = new Intent(NOTIFICATION);
-                notifIntent.putExtra(NOTIFICATION, "HTTP");
-                sendBroadcast(notifIntent);
+                if (!params.startsWith("tracker=")) {
+                    lastServerResponse = getResources().getString(R.string.last_location_sent_at)
+                            + " "
+                            + DateFormat.getTimeInstance().format(new Date())
+                            + " ";
+
+                    if (code == 200) {
+                        lastServerResponse += "<font color='#00aa00'><b>"
+                                + getResources().getString(R.string.http_request_ok)
+                                + "</b></font>";
+                    } else {
+                        lastServerResponse += "<font color='#ff0000'><b>"
+                                + getResources().getString(R.string.http_request_failed)
+                                + "</b></font>"
+                                + "<br>"
+                                + "(" + message + ")";
+                    }
+
+                    Intent notifIntent = new Intent(NOTIFICATION);
+                    notifIntent.putExtra(NOTIFICATION, "HTTP");
+                    sendBroadcast(notifIntent);
+                }
+
+                if (!success) {
+                    try {
+                        Thread.sleep(retry * 1000); // note: when device is sleeping, it may last longer
+                    } catch (Exception e) {
+                    }
+                }
             }
         }
 
