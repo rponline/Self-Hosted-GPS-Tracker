@@ -17,7 +17,7 @@
     <string name="pref_gps_updates_summary">Update GPS position approximately every… (5 seconds minimum)</string>
     <string name="pref_gps_updates_too_low">Sorry, this value is too low.</string>
     <string name="pref_gps_updates_too_high">Sorry, this value is greater than max run time.</string>
-    <string name="pref_battery_drain">Watch out! Values below 30s can drain your battery.</string>
+    <string name="pref_gps_updates_battery_drain">Watch out! Values below 30s can drain your battery.</string>
 
     <string name="pref_max_run_time">Max run time (hours)</string>
     <string name="pref_max_run_time_summary">(defaults to 8 hours)</string>
@@ -25,7 +25,10 @@
 
     <string name="pref_timestamp">Timestamp on each request</string>
     <string name="pref_timestamp_summary">Add t=(milliseconds) to the parameters</string>
-    
+
+    <string name="pref_gps_awake">Keep GPS awake</string>
+    <string name="pref_gps_awake_explain">More accurate but uses more power</string>
+
     <string name="text_legend_url_0">Send GPS coordinates to :</string>
     <string name="text_legend_url_1">Example: http://herverenault.fr/gps</string>
     <string name="text_legend_url_2">Latitude and longitude added automatically</string>

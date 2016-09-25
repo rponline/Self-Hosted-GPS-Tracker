@@ -39,7 +39,7 @@ public class SelfHostedGPSTrackerPrefs extends PreferenceActivity {
                     Alert(getString(R.string.pref_gps_updates_too_low));
                     return false;
                 } else if (Integer.parseInt(newValue.toString()) < 30) {
-                    Alert(getString(R.string.pref_battery_drain));
+                    Alert(getString(R.string.pref_gps_updates_battery_drain));
                 } else if (SelfHostedGPSTrackerService.isRunning
                         && Integer.parseInt(newValue.toString()) != oldValue) {
                     Alert(getString(R.string.toast_prefs_restart));

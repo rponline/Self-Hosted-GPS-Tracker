@@ -21,4 +21,10 @@
         android:summary="@string/pref_timestamp_summary"
         android:defaultValue="false" />
 
+    <CheckBoxPreference
+        android:key="pref_accuracy"
+        android:title="@string/pref_gps_awake"
+        android:summary="@string/pref_gps_awake_explain"
+        android:defaultValue="false" />
+
 </PreferenceScreen>

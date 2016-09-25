@@ -9,11 +9,14 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
@@ -75,7 +78,10 @@ public class SelfHostedGPSTrackerService extends IntentService implements Locati
             urlText = urlText + "?";
         }
 
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, pref_gps_updates * 1000, 1, this);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                preferences.getBoolean("pref_accuracy", false) ? 1 : pref_gps_updates * 1000,
+                preferences.getBoolean("pref_accuracy", false) ? 0 : 1,
+                this);
 
         lastServerResponse = getResources().getString(R.string.waiting_for_gps_data);
         Intent notifIntent = new Intent(NOTIFICATION);
@@ -135,9 +141,7 @@ public class SelfHostedGPSTrackerService extends IntentService implements Locati
         Log.d(MY_TAG, "in onLocationChanged, latestUpdate == " + latestUpdate);
         long currentTime = location.getTime();
 
-        // Tolerate devices which sometimes send GPS updates 1 second too early,
-        // such as HTC One Mini...
-        if ((currentTime - latestUpdate) < (pref_gps_updates - 1) * 1000) {
+        if ((currentTime - latestUpdate) < (pref_gps_updates * 1000)) {
             return;
         }
 

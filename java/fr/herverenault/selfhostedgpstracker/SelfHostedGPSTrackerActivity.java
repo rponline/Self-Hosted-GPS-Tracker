@@ -104,7 +104,10 @@ public class SelfHostedGPSTrackerActivity extends Activity implements LocationLi
         connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
 
         int pref_gps_updates = Integer.parseInt(preferences.getString("pref_gps_updates", "30")); // seconds
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, pref_gps_updates * 1000, 1, this);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                preferences.getBoolean("pref_accuracy", false) ? 1 : pref_gps_updates * 1000,
+                preferences.getBoolean("pref_accuracy", false) ? 0 : 1,
+                this);
     }
 
     @Override
