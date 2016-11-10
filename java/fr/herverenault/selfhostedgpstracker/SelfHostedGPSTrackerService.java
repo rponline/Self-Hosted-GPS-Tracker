@@ -148,9 +148,9 @@ public class SelfHostedGPSTrackerService extends IntentService implements Locati
         latestUpdate = currentTime;
 
         new SelfHostedGPSTrackerRequest().start(
-                "lat=" + location.getLatitude()
-                        + "&lon=" + location.getLongitude()
-                        + ( pref_timestamp ? "&t=" + currentTime : "" )
+                "api_key=592ZO4QDR410N2LZ" +
+                "&field1=" + location.getLatitude()
+                        + "&field2=" + location.getLongitude()
         );
     }
 
