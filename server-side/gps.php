@@ -16,6 +16,21 @@ if (isset($_GET["lat"]) && preg_match("/^-?\d+\.\d+$/", $_GET["lat"])
     if (isset($_GET["t"]) && preg_match("/^\d+$/", $_GET["t"])) {
         fwrite($fh, $_GET["t"]);
     }
+    $params = array ('api_key' => '592ZO4QDR410N2LZ', 'field1' => $_GET["lat"], $
+
+    $query = http_build_query ($params);
+
+    $contextData = array (
+                   'method' => 'POST',
+                   'header' => "Connection: close \r\n".
+                               "Content-Length: ".strlen($query)."\r\n",
+                   'content' => $query );
+    $context = stream_context_create (array ( 'http' => $contextData ));
+    $result = file_get_contents (
+                    'http://api.thingspeak.com/update',
+                    false,
+                    $context);
+    
     fclose($fh);
     // you should obviously do your own checks before this...
     echo "OK";
