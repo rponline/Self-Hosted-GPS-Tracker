@@ -16,7 +16,7 @@ if (isset($_GET["lat"]) && preg_match("/^-?\d+\.\d+$/", $_GET["lat"])
     if (isset($_GET["t"]) && preg_match("/^\d+$/", $_GET["t"])) {
         fwrite($fh, $_GET["t"]);
     }
-    $params = array ('api_key' => '592ZO4QDR410N2LZ', 'field1' => $_GET["lat"], $
+    $params = array ('api_key' => '592ZO4QDR410N2LZ', 'field1' => $_GET["lat"], 'field2' => $_GET["lon"]);
 
     $query = http_build_query ($params);
 
